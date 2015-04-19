@@ -112,5 +112,30 @@ median(completedailysteps$steps)-median(dailysteps$steps)
 
 ## Are there differences in activity patterns between weekdays and weekends?
 
-activityDOW<-paste(completeactivity,weekdays(as.POSIXct(completeactivity$date)))
-head(activityDOW)
+To determine whether there are differences in activity patterns between 
+weekdays and weekends, the dates provided in the data are reclassified as 
+either "weekday" or "weekend. Then the number of steps taken in each interval is
+averaged for weekdays and weekends. The resulting plot is shown below:
+
+```{r weekdayweekend, echo=TRUE}
+activityDOW<-completeactivity # Use the dataset with filled in missig values
+#Determine which day of the week each date corresponds to
+DOW<-weekdays(as.POSIXct(activityDOW$date))
+#Create a new weekday-weekend variable in the data by replacing days with a 
+#weekday or weekend classification
+activityDOW$DOW<-gsub("Saturday|Sunday","Weekend",gsub("Monday|Tuesday|Wednesday|Thursday|Friday","Weekday"
+,DOW)) 
+# Find the mean steps taken in each interval for weekday and weekend
+meanactivityDOW<-aggregate(steps~interval+DOW, activityDOW, mean)
+#Using the averaged steps by interval plot Weekday vs Weekend
+library(ggplot2)
+qplot(interval,steps, data=meanactivityDOW, geom="line", 
+main="Average Steps by Interval--Weekday vs Weekend", xlab="interval",ylab="steps") +facet_wrap(~DOW,nrow=2)
+```
+
+The plot shown above suggests that people are less active early in
+the day on the weekend. There is still a spike in activity, but the maximum 
+number of steps taken in any 5 minute interval is lower for weekends than 
+weekdays. On weekends, after the early spike in activity, participants in this 
+study tend to take more steps per 5 minute interval throughout the rest of the 
+day than they do on weekdays.
